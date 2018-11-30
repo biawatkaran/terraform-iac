@@ -1,0 +1,9 @@
+# IDEs and editors
+/.idea
+*.iml
+
+
+### Terraform ###
+*.terraform
+*.tfstate
+*.tfstate.backup
