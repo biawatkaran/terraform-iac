@@ -17,3 +17,8 @@ format("%.3f", 3.14159265359)
 ${file("SOME_SCRIPT")}  in case script tries to read another terraform output vars NOT POSSIBLE like this
 so we define template_file data
 
+* Modules
+need to define relative path for any file as ${path.module} as TF root command is different 
+
+REF: Terraform - Up and Running
+

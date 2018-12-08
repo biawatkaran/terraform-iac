@@ -1,15 +1,7 @@
 #EC2 does not allow incoming/outgoing traffic hence defined security group for EC2 instance running webserver
-resource "aws_security_group" "terraform_training"{
+resource "aws_security_group" "terraform_training_instance"{
 
-  name = "terraform-training"
-
-  ingress {
-
-    from_port = "${var.server_port}"
-    to_port = "${var.server_port}"
-    protocol = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+  name = "${var.cluster_name}-instance"
 
   lifecycle {
 
@@ -18,6 +10,16 @@ resource "aws_security_group" "terraform_training"{
 
 }
 
+resource "aws_security_group_rule" "allow_http_inbound" {
+
+  type = "ingress"
+  security_group_id = "${aws_security_group.terraform_training_instance.id}"
+
+  from_port = "${var.instance_port}"
+  to_port = "${var.instance_port}"
+  protocol = "tcp"
+  cidr_blocks = ["0.0.0.0/0"]
+}
 
 # ASG auto scale group for cloud cluster (instances)
 resource "aws_launch_configuration" "terraform_training" {
@@ -25,7 +27,7 @@ resource "aws_launch_configuration" "terraform_training" {
   image_id = "ami-872cc7e0"
   instance_type = "t2.micro"
   #interpolation "${ResourceType.InstanceName.Atrribute}"
-  security_groups = ["${aws_security_group.terraform_training.id}"]
+  security_groups = ["${aws_security_group.terraform_training_instance.id}"]
 
   #dummy web server
   user_data = "${data.template_file.user_data.rendered}"
@@ -51,7 +53,7 @@ resource "aws_autoscaling_group" "terraform_training" {
 
   tag {
     key = "Name"
-    value = "terraform-training"
+    value = "${var.cluster_name}"
     propagate_at_launch = true
   }
 }
@@ -69,7 +71,7 @@ resource "aws_instance" "terraform-training" {
   user_data = <<-EOF
                 #!/bin/bash
                 echo "Hello , World" > index.html
-                nohup busybox httpd -f -p "${var.server_port}" &
+                nohup busybox httpd -f -p "${var.instance_port}" &
               EOF
 
   tags {

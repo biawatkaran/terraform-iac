@@ -1,9 +1,9 @@
 output "address" {
 
-  value = "${aws_db_instance.terraform_training.address}"
+  value = "${module.mysql_cluster.address}"
 }
 
 output "port" {
 
-    value = "${aws_db_instance.terraform_training.port}"
+    value = "${module.mysql_cluster.port}"
 }
